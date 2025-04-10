@@ -16,26 +16,36 @@ interface SettingsItemProps {
     showArrow?: boolean;
 }
 
-const SettingItems = ({ icon, title, onPress, textStyle, showArrow = true }: SettingsItemProps) => (
-    <TouchableOpacity onPress={onPress} className="flex flex-row items-center justify-between py-3">
-        <View className="flex flex-row items-center gap-3">
-            <Image source={icon} className="size-6" />
-            <Text className={`text-lg font-rubik-medium text-black-300 ${textStyle}`}>{title}</Text>
-        </View>
-        {showArrow && <Image source={icons.rightArrow} className="size-5" />}
-    </TouchableOpacity>
-);
+const SettingItems = ({ icon, title, onPress, textStyle, showArrow = true }: SettingsItemProps) => {
+    const { t } = useTranslation();
+    return (
+        <TouchableOpacity onPress={onPress} className="flex flex-row items-center justify-between py-3">
+            <View className="flex flex-row items-center gap-3">
+                <Image source={icon} className="size-6" />
+                <Text className={`text-lg font-rubik-medium text-black-300 ${textStyle}`}>{t(title)}</Text>
+            </View>
+            {showArrow && <Image source={icons.rightArrow} className="size-5" />}
+        </TouchableOpacity>
+    );
+};
 
 const Profile = () => {
     const { user, refetch } = useGlobalContext();
-    const { t } = useTranslation(); // Хук для получения переводов
+    const { t } = useTranslation();
 
     const handleLogout = async () => {
-        const result = await logout();
-        if (result) {
-            Alert.alert(t('success'), t('loggedOut'));
-            refetch();
-        } else {
+        const { addError } = useGlobalContext(); // Добавляем доступ к addError
+        try {
+            const result = await logout();
+            if (result) {
+                Alert.alert(t('success'), t('loggedOut'));
+                refetch();
+            } else {
+                addError('Logout failed without specific error');
+                Alert.alert(t('error'), t('failedToLogout'));
+            }
+        } catch (error: any) {
+            addError(`Logout error: ${error.message}`);
             Alert.alert(t('error'), t('failedToLogout'));
         }
     };
@@ -45,7 +55,9 @@ const Profile = () => {
             <ScrollView showsHorizontalScrollIndicator={false} contentContainerClassName="pb-32 px-7">
                 <View className="flex flex-row items-center justify-between mt-5">
                     <Text className="text-xl font-rubik-bold">{t('profile')}</Text>
-                    <Image source={icons.bell} className="size-5" />
+                    <TouchableOpacity onPress={() => router.push('/(root)/profile/notifications')}>
+                        <Image source={icons.bell} className="size-5" />
+                    </TouchableOpacity>
                 </View>
 
                 <View className="flex-row justify-center flex mt-5">
@@ -60,20 +72,25 @@ const Profile = () => {
 
                 <View className="flex flex-col mt-10">
                     <SettingItems
-                        onPress={() => router.push('/(root)/properties/bookings')}
+                        onPress={() => router.push('/(root)/profile/bookings')}
                         icon={icons.calendar}
-                        title={t('myBookings')}
+                        title="myBookings"
                     />
-                    <SettingItems icon={icons.wallet} title={t('payments')} />
+                    <SettingItems icon={icons.wallet} title="payments" />
                 </View>
 
                 <View className="flex flex-col mt-5 border-t pt-5 border-primary-200">
                     <SettingItems
-                        icon={icons.language} // Предполагается, что у вас есть иконка языка
-                        title={t('language')}
-                        onPress={() => router.push('/(root)/profile/language')} // Переход на страницу языка
+                        icon={icons.language}
+                        title="language"
+                        onPress={() => router.push('/(root)/profile/language')}
                     />
-                    {settings.slice(2).map((item, index) => (
+                    <SettingItems
+                        icon={icons.bell}
+                        title="notifications"
+                        onPress={() => router.push('/(root)/profile/notifications')}
+                    />
+                    {settings.slice(3).map((item, index) => (
                         <SettingItems key={index} {...item} />
                     ))}
                 </View>
@@ -81,7 +98,7 @@ const Profile = () => {
                 <View className="flex flex-col mt-5 border-t pt-5 border-primary-200">
                     <SettingItems
                         icon={icons.logout}
-                        title={t('logout')}
+                        title="logout"
                         textStyle="text-danger"
                         showArrow={false}
                         onPress={handleLogout}

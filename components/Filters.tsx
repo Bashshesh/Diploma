@@ -19,7 +19,7 @@ const Filters = () => {
         setSelectedCategory(category);
         router.setParams({ filter: category });
     };
-//сруслфлдаы
+
     return (
         <ScrollView horizontal showsHorizontalScrollIndicator={false} className="mt-3 mb-2">
             {categories.map((item, index) => (
@@ -35,7 +35,7 @@ const Filters = () => {
                             selectedCategory === item.category ? 'text-white font-rubik-bold mt-0.5' : 'text-black-300 font-rubik'
                         }`}
                     >
-                        {t(item.category.toLowerCase())} {/* Переводим категории */}
+                        {t(item.title)}
                     </Text>
                 </TouchableOpacity>
             ))}

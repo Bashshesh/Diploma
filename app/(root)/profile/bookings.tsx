@@ -18,24 +18,35 @@ const Bookings = () => {
             try {
                 const favoritesJson = await AsyncStorage.getItem(FAVORITES_KEY);
                 const favoriteIds = favoritesJson ? JSON.parse(favoritesJson) : [];
+                console.log('Favorite IDs:', favoriteIds);
 
                 if (favoriteIds.length > 0) {
-                    // Получаем свойства по ID из Appwrite
                     const properties = await getProperties({
                         filter: '',
                         advancedFilter: '',
                         query: '',
-                        limit: 100, // Увеличиваем лимит, чтобы получить все возможные свойства
+                        limit: 100,
                     });
+                    console.log('Fetched Properties:', properties);
+
                     const favoriteProperties = properties.filter(property =>
                         favoriteIds.includes(property.$id)
                     );
+                    console.log('Filtered Favorites:', favoriteProperties);
+
+                    const validFavoriteIds = favoriteProperties.map(prop => prop.$id);
+                    if (validFavoriteIds.length !== favoriteIds.length) {
+                        await AsyncStorage.setItem(FAVORITES_KEY, JSON.stringify(validFavoriteIds));
+                        console.log('Updated AsyncStorage with valid IDs:', validFavoriteIds);
+                    }
+
                     setFavorites(favoriteProperties);
                 } else {
                     setFavorites([]);
                 }
             } catch (error) {
                 console.error('Error fetching favorites:', error);
+                setFavorites([]);
             } finally {
                 setLoading(false);
             }
@@ -43,7 +54,14 @@ const Bookings = () => {
         fetchFavorites();
     }, []);
 
-    const handleCardPress = (id: string) => router.push(`/properties/${id}`);
+    const handleCardPress = (id: string) => {
+        console.log('Navigating to property with ID:', id); // Debug log
+        if (id && id !== 'bookings' && id.match(/^[a-f0-9]{24}$/i)) { // Validate ID
+            router.push(`/properties/${id}`);
+        } else {
+            console.error('Invalid property ID:', id);
+        }
+    };
 
     return (
         <SafeAreaView className="bg-white h-full">

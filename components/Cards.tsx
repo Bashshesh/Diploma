@@ -4,18 +4,19 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import icons from '@/constants/icons';
 import images from '@/constants/images';
 import { Models } from 'react-native-appwrite';
+import { useTranslation } from 'react-i18next';
 
 interface Props {
     item: Models.Document;
     onPress?: () => void;
 }
 
-const FAVORITES_KEY = '@favorites'; // Ключ для хранения избранного в AsyncStorage
+const FAVORITES_KEY = '@favorites';
 
 export const Card = ({ item: { image, rating, name, address, price, $id }, onPress }: Props) => {
+    const { t } = useTranslation();
     const [isFavorite, setIsFavorite] = useState(false);
 
-    // Загрузка статуса избранного при монтировании компонента
     useEffect(() => {
         const loadFavoriteStatus = async () => {
             try {
@@ -29,17 +30,14 @@ export const Card = ({ item: { image, rating, name, address, price, $id }, onPre
         loadFavoriteStatus();
     }, [$id]);
 
-    // Переключение статуса избранного
     const toggleFavorite = async () => {
         try {
             const favorites = await AsyncStorage.getItem(FAVORITES_KEY);
             let favoritesArray = favorites ? JSON.parse(favorites) : [];
 
             if (isFavorite) {
-                // Удаляем из избранного
                 favoritesArray = favoritesArray.filter((id: string) => id !== $id);
             } else {
-                // Добавляем в избранное
                 favoritesArray.push($id);
             }
 
@@ -63,15 +61,15 @@ export const Card = ({ item: { image, rating, name, address, price, $id }, onPre
             <Image source={{ uri: image }} className="w-full h-40 rounded-lg" />
 
             <View className="flex flex-col mt-2">
-                <Text className="text-base font-rubik-bold text-black-300">{name}</Text>
-                <Text className="text-xs font-rubik text-black-300">{address}</Text>
+                <Text className="text-base font-rubik-bold text-black-300">{t(name)}</Text>
+                <Text className="text-xs font-rubik text-black-300">{t(address)}</Text>
                 <View className="flex flex-row items-center justify-between mt-2">
                     <Text className="text-base font-rubik-bold text-primary-300">{price}</Text>
                     <TouchableOpacity onPress={toggleFavorite}>
                         <Image
                             source={icons.heart}
                             className="w-5 h-5 mr-2"
-                            tintColor={isFavorite ? '#FF0000' : '#191d31'} // Красный, если в избранном
+                            tintColor={isFavorite ? '#FF0000' : '#191d31'}
                         />
                     </TouchableOpacity>
                 </View>
@@ -81,9 +79,9 @@ export const Card = ({ item: { image, rating, name, address, price, $id }, onPre
 };
 
 export const FeaturedCard = ({ item: { image, rating, name, address, price, $id }, onPress }: Props) => {
+    const { t } = useTranslation();
     const [isFavorite, setIsFavorite] = useState(false);
 
-    // Загрузка статуса избранного при монтировании компонента
     useEffect(() => {
         const loadFavoriteStatus = async () => {
             try {
@@ -97,17 +95,14 @@ export const FeaturedCard = ({ item: { image, rating, name, address, price, $id 
         loadFavoriteStatus();
     }, [$id]);
 
-    // Переключение статуса избранного
     const toggleFavorite = async () => {
         try {
             const favorites = await AsyncStorage.getItem(FAVORITES_KEY);
             let favoritesArray = favorites ? JSON.parse(favorites) : [];
 
             if (isFavorite) {
-                // Удаляем из избранного
                 favoritesArray = favoritesArray.filter((id: string) => id !== $id);
             } else {
-                // Добавляем в избранное
                 favoritesArray.push($id);
             }
 
@@ -130,16 +125,16 @@ export const FeaturedCard = ({ item: { image, rating, name, address, price, $id 
 
             <View className="flex flex-col items-start absolute bottom-5 inset-x-5">
                 <Text className="text-xl font-rubik-extrabold text-white" numberOfLines={1}>
-                    {name}
+                    {t(name)}
                 </Text>
-                <Text className="text-base font-rubik text-white">{address}</Text>
+                <Text className="text-base font-rubik text-white">{t(address)}</Text>
                 <View className="flex flex-row items-center justify-between w-full">
                     <Text className="text-xl font-rubik-extrabold text-white">{price}</Text>
                     <TouchableOpacity onPress={toggleFavorite}>
                         <Image
                             source={icons.heart}
                             className="size-5"
-                            tintColor={isFavorite ? '#FF0000' : '#FFFFFF'} // Красный, если в избранном
+                            tintColor={isFavorite ? '#FF0000' : '#FFFFFF'}
                         />
                     </TouchableOpacity>
                 </View>
