@@ -4,25 +4,56 @@ import { router, useLocalSearchParams } from "expo-router";
 import { useAppwrite } from "@/lib/useAppWrite";
 import { getPropertyById } from "@/lib/appwrite";
 import icons from "@/constants/icons";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { StatusBar } from "expo-status-bar";
 import { facilities } from "@/constants/data";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useTranslation } from 'react-i18next';
+
+const FAVORITES_KEY = '@favorites';
 
 export default function PropertyDetails() {
+    const { t } = useTranslation(); // Хук для переводов
     const { id } = useLocalSearchParams<{ id: string }>();
-
     const { data: property, loading, refetch, error } = useAppwrite({
         fn: getPropertyById,
         params: { id },
     });
+    const [isFavorite, setIsFavorite] = useState(false);
 
     useEffect(() => {
-        if (id) refetch({ id });
+        if (id) {
+            refetch({ id });
+            const loadFavoriteStatus = async () => {
+                try {
+                    const favorites = await AsyncStorage.getItem(FAVORITES_KEY);
+                    const favoritesArray = favorites ? JSON.parse(favorites) : [];
+                    setIsFavorite(favoritesArray.includes(id));
+                } catch (error) {
+                    console.error('Error loading favorites:', error);
+                }
+            };
+            loadFavoriteStatus();
+        }
     }, [id]);
 
-    console.log("Property ID:", id);
-    console.log("Property data:", property);
-    console.log("Galleries:", property?.galleries);
+    const toggleFavorite = async () => {
+        try {
+            const favorites = await AsyncStorage.getItem(FAVORITES_KEY);
+            let favoritesArray = favorites ? JSON.parse(favorites) : [];
+
+            if (isFavorite) {
+                favoritesArray = favoritesArray.filter((favId: string) => favId !== id);
+            } else {
+                favoritesArray.push(id);
+            }
+
+            await AsyncStorage.setItem(FAVORITES_KEY, JSON.stringify(favoritesArray));
+            setIsFavorite(!isFavorite);
+        } catch (error) {
+            console.error('Error toggling favorite:', error);
+        }
+    };
 
     if (loading) {
         return (
@@ -36,7 +67,7 @@ export default function PropertyDetails() {
         return (
             <SafeAreaView className="bg-white h-full">
                 <Text className="text-center text-lg font-rubik-medium text-black-300 mt-5">
-                    Error loading property: {error.message}
+                    {t('errorLoadingProperty', { message: error.message })}
                 </Text>
             </SafeAreaView>
         );
@@ -46,7 +77,7 @@ export default function PropertyDetails() {
         return (
             <SafeAreaView className="bg-white h-full">
                 <Text className="text-center text-lg font-rubik-medium text-black-300 mt-5">
-                    Property not found
+                    {t('propertyNotFound')}
                 </Text>
             </SafeAreaView>
         );
@@ -56,7 +87,6 @@ export default function PropertyDetails() {
         <SafeAreaView className="bg-white h-full" edges={['right', 'left', 'bottom']}>
             <StatusBar backgroundColor="#ffffff" barStyle="dark-content" />
             <ScrollView showsVerticalScrollIndicator={false} bounces={false}>
-                {/* Header Image */}
                 <View className="relative">
                     <Image
                         source={{ uri: property.image || "https://via.placeholder.com/400" }}
@@ -69,44 +99,49 @@ export default function PropertyDetails() {
                     >
                         <Image source={icons.backArrow} className="size-6" />
                     </TouchableOpacity>
-                    <TouchableOpacity className="absolute top-5 right-5 bg-white rounded-full p-2 mt-10">
-                        <Image source={icons.info} className="size-6" />
+                    <TouchableOpacity
+                        onPress={toggleFavorite}
+                        className="absolute top-5 right-5 bg-white rounded-full p-2 mt-10"
+                    >
+                        <Image
+                            source={icons.heart}
+                            className="size-6"
+                            tintColor={isFavorite ? '#FF0000' : '#191d31'}
+                        />
                     </TouchableOpacity>
                     <TouchableOpacity className="absolute top-5 right-16 bg-white rounded-full p-2 mt-10">
                         <Image source={icons.send} className="size-6" />
                     </TouchableOpacity>
                 </View>
 
-                {/* Property Info */}
                 <View className="px-5 mt-5">
-                    <Text className="text-2xl font-rubik-bold text-black-300">{property.name || "Property Name"}</Text>
-                    <Text className="text-sm font-rubik text-black-100">Apartment</Text>
+                    <Text className="text-2xl font-rubik-bold text-black-300">{property.name || t('propertyName')}</Text>
+                    <Text className="text-sm font-rubik text-black-100">{t('apartment')}</Text>
                     <View className="flex flex-row items-center mt-2">
                         <Image source={icons.star} className="size-5 mr-1" />
                         <Text className="text-sm font-rubik-medium text-black-300">
                             {property.rating || 0} (
-                            {property.reviewsCount || (Array.isArray(property.reviews) ? property.reviews.length : property.reviews ? 1 : 0)} reviews)
+                            {property.reviewsCount || (Array.isArray(property.reviews) ? property.reviews.length : property.reviews ? 1 : 0)} {t('reviews')})
                         </Text>
                     </View>
                     <View className="flex flex-row items-center mt-3">
                         <View className="flex flex-row items-center mr-5">
                             <Image source={icons.bed} className="size-5 mr-1" />
-                            <Text className="text-sm font-rubik text-black-300">{property.bedrooms || 0} Beds</Text>
+                            <Text className="text-sm font-rubik text-black-300">{property.bedrooms || 0} {t('beds')}</Text>
                         </View>
                         <View className="flex flex-row items-center mr-5">
                             <Image source={icons.bath} className="size-5 mr-1" />
-                            <Text className="text-sm font-rubik text-black-300">{property.bathrooms || 0} Bath</Text>
+                            <Text className="text-sm font-rubik text-black-300">{property.bathrooms || 0} {t('bath')}</Text>
                         </View>
                         <View className="flex flex-row items-center">
                             <Image source={icons.area} className="size-5 mr-1" />
-                            <Text className="text-sm font-rubik text-black-300">{property.area || 0} sqft</Text>
+                            <Text className="text-sm font-rubik text-black-300">{property.area || 0} {t('sqft')}</Text>
                         </View>
                     </View>
                 </View>
 
-                {/* Agent Section */}
                 <View className="px-5 mt-5">
-                    <Text className="text-lg font-rubik-bold text-black-300">Agent</Text>
+                    <Text className="text-lg font-rubik-bold text-black-300">{t('agent')}</Text>
                     <View className="flex flex-row items-center mt-3">
                         <Image
                             source={{ uri: property.agent?.avatar || "https://via.placeholder.com/50" }}
@@ -114,10 +149,10 @@ export default function PropertyDetails() {
                         />
                         <View className="ml-3 flex-1">
                             <Text className="text-base font-rubik-medium text-black-300">
-                                {property.agent?.name || "Unknown Agent"}
+                                {property.agent?.name || t('unknownAgent')}
                             </Text>
                             <Text className="text-sm font-rubik text-black-100">
-                                {property.agent?.email || "No email available"}
+                                {property.agent?.email || t('noEmail')}
                             </Text>
                         </View>
                         <TouchableOpacity className="bg-primary-100 rounded-full p-2">
@@ -129,15 +164,13 @@ export default function PropertyDetails() {
                     </View>
                 </View>
 
-                {/* Overview Section */}
                 <View className="px-5 mt-5">
-                    <Text className="text-lg font-rubik-bold text-black-300">Overview</Text>
-                    <Text className="text-sm font-rubik text-black-100 mt-2">{property.description || "No description available."}</Text>
+                    <Text className="text-lg font-rubik-bold text-black-300">{t('overview')}</Text>
+                    <Text className="text-sm font-rubik text-black-100 mt-2">{property.description || t('noDescription')}</Text>
                 </View>
 
-                {/* Facilities Section */}
                 <View className="px-5 mt-5">
-                    <Text className="text-lg font-rubik-bold text-black-300">Facilities</Text>
+                    <Text className="text-lg font-rubik-bold text-black-300">{t('facilities')}</Text>
                     <View className="flex flex-row flex-wrap mt-3">
                         {property.facilities && property.facilities.length > 0 ? (
                             facilities
@@ -149,14 +182,13 @@ export default function PropertyDetails() {
                                     </View>
                                 ))
                         ) : (
-                            <Text className="text-sm font-rubik text-black-100">No facilities available.</Text>
+                            <Text className="text-sm font-rubik text-black-100">{t('noFacilities')}</Text>
                         )}
                     </View>
                 </View>
 
-                {/* Gallery Section */}
                 <View className="px-5 mt-5">
-                    <Text className="text-lg font-rubik-bold text-black-300">Gallery</Text>
+                    <Text className="text-lg font-rubik-bold text-black-300">{t('gallery')}</Text>
                     {property.galleries && property.galleries.length > 0 ? (
                         <FlatList
                             data={property.galleries}
@@ -169,16 +201,15 @@ export default function PropertyDetails() {
                             contentContainerClassName="mt-3"
                         />
                     ) : (
-                        <Text className="text-sm font-rubik text-black-100 mt-3">No gallery images available.</Text>
+                        <Text className="text-sm font-rubik text-black-100 mt-3">{t('noGallery')}</Text>
                     )}
                 </View>
 
-                {/* Location Section */}
                 <View className="px-5 mt-5">
-                    <Text className="text-lg font-rubik-bold text-black-300">Location</Text>
+                    <Text className="text-lg font-rubik-bold text-black-300">{t('location')}</Text>
                     <View className="flex flex-row items-center mt-3">
                         <Image source={icons.location} className="size-5 mr-2" />
-                        <Text className="text-sm font-rubik text-black-300">{property.location || "Location not available"}</Text>
+                        <Text className="text-sm font-rubik text-black-300">{property.location || t('noLocation')}</Text>
                     </View>
                     <Image
                         source={{ uri: property.mapImage || "https://via.placeholder.com/300" }}
@@ -187,18 +218,17 @@ export default function PropertyDetails() {
                     />
                 </View>
 
-                {/* Reviews Section */}
                 <View className="px-5 mt-5">
                     <View className="flex flex-row items-center justify-between">
                         <View className="flex flex-row items-center">
                             <Image source={icons.star} className="size-5 mr-1" />
                             <Text className="text-sm font-rubik-medium text-black-300">
                                 {property.rating || 0} (
-                                {property.reviewsCount || (Array.isArray(property.reviews) ? property.reviews.length : property.reviews ? 1 : 0)} reviews)
+                                {property.reviewsCount || (Array.isArray(property.reviews) ? property.reviews.length : property.reviews ? 1 : 0)} {t('reviews')})
                             </Text>
                         </View>
                         <TouchableOpacity>
-                            <Text className="text-sm font-rubik-bold text-primary-300">See all</Text>
+                            <Text className="text-sm font-rubik-bold text-primary-300">{t('seeAll')}</Text>
                         </TouchableOpacity>
                     </View>
 
@@ -215,7 +245,7 @@ export default function PropertyDetails() {
                                         <View className="ml-3 flex-1">
                                             <View className="flex flex-row items-center justify-between">
                                                 <Text className="text-sm font-rubik-medium text-black-300">
-                                                    {item.name || "Anonymous"}
+                                                    {item.name || t('anonymous')}
                                                 </Text>
                                                 <View className="flex flex-row items-center">
                                                     <Image source={icons.star} className="size-4 mr-1" />
@@ -223,12 +253,12 @@ export default function PropertyDetails() {
                                                 </View>
                                             </View>
                                             <Text className="text-xs font-rubik text-black-100 mt-1">
-                                                {item.review || "No review text available."}
+                                                {item.review || t('noReviewText')}
                                             </Text>
                                             <Text className="text-xs font-rubik text-black-100 mt-1">
                                                 {item.$createdAt
                                                     ? new Date(item.$createdAt).toLocaleDateString()
-                                                    : "Date not available"}
+                                                    : t('noDate')}
                                             </Text>
                                         </View>
                                     </View>
@@ -238,16 +268,15 @@ export default function PropertyDetails() {
                             showsVerticalScrollIndicator={false}
                         />
                     ) : (
-                        <Text className="text-sm font-rubik text-black-100 mt-3">No reviews available.</Text>
+                        <Text className="text-sm font-rubik text-black-100 mt-3">{t('noReviews')}</Text>
                     )}
                 </View>
 
-                {/* Price and Booking Button */}
                 <View className="px-5 mt-5 mb-10">
                     <View className="flex flex-row items-center justify-between">
                         <Text className="text-xl font-rubik-bold text-black-300">${property.price || 0}</Text>
                         <TouchableOpacity className="bg-primary-300 rounded-full px-5 py-3">
-                            <Text className="text-base font-rubik-medium text-white">Booking Now</Text>
+                            <Text className="text-base font-rubik-medium text-white">{t('bookingNow')}</Text>
                         </TouchableOpacity>
                     </View>
                 </View>

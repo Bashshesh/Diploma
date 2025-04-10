@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { View, Text, TouchableOpacity, Modal } from "react-native";
 import Slider from "@react-native-community/slider";
 import { router, useLocalSearchParams } from "expo-router";
-import {categories} from "@/constants/data";
+import { useTranslation } from 'react-i18next';
 
 interface AdvancedFiltersProps {
     visible: boolean;
@@ -10,9 +10,9 @@ interface AdvancedFiltersProps {
 }
 
 const AdvancedFilters = ({ visible, setVisible }: AdvancedFiltersProps) => {
+    const { t } = useTranslation();
     const params = useLocalSearchParams<{ advancedFilter?: string }>();
 
-    // Safely parse advancedFilter, default to {} if invalid or undefined
     let initialFilter = {};
     if (params.advancedFilter && typeof params.advancedFilter === "string") {
         try {
@@ -56,9 +56,7 @@ const AdvancedFilters = ({ visible, setVisible }: AdvancedFiltersProps) => {
         setBedrooms(2);
         setBathrooms(1);
         setAreaRange([500, 3000]);
-
-        // Clear the advancedFilter param by setting it to an empty object or removing it
-        router.setParams({ advancedFilter: JSON.stringify({}) }); // Or simply omit it
+        router.setParams({ advancedFilter: JSON.stringify({}) });
     };
 
     return (
@@ -74,13 +72,13 @@ const AdvancedFilters = ({ visible, setVisible }: AdvancedFiltersProps) => {
                         <TouchableOpacity onPress={() => setVisible(false)}>
                             <Text className="text-lg">←</Text>
                         </TouchableOpacity>
-                        <Text className="text-lg font-rubik-bold text-black-300">Filter</Text>
+                        <Text className="text-lg font-rubik-bold text-black-300">{t('filter')}</Text>
                         <TouchableOpacity onPress={handleReset}>
-                            <Text className="text-base font-rubik text-primary-300">Reset</Text>
+                            <Text className="text-base font-rubik text-primary-300">{t('reset')}</Text>
                         </TouchableOpacity>
                     </View>
 
-                    <Text className="text-base font-rubik-medium text-black-300 mb-2">Price Range</Text>
+                    <Text className="text-base font-rubik-medium text-black-300 mb-2">{t('priceRange')}</Text>
                     <Slider
                         minimumValue={1000}
                         maximumValue={10000}
@@ -106,7 +104,7 @@ const AdvancedFilters = ({ visible, setVisible }: AdvancedFiltersProps) => {
                         <Text>${priceRange[1]}</Text>
                     </View>
 
-                    <Text className="text-base font-rubik-medium text-black-300 mt-5 mb-2">Property Type</Text>
+                    <Text className="text-base font-rubik-medium text-black-300 mt-5 mb-2">{t('propertyType')}</Text>
                     <View className="flex-row flex-wrap gap-2">
                         {propertyTypes.map((type) => (
                             <TouchableOpacity
@@ -121,15 +119,15 @@ const AdvancedFilters = ({ visible, setVisible }: AdvancedFiltersProps) => {
                                         propertyType === type ? "text-white" : "text-black-300"
                                     }`}
                                 >
-                                    {type}
+                                    {t(type.toLowerCase())} {/* Переводим типы свойств */}
                                 </Text>
                             </TouchableOpacity>
                         ))}
                     </View>
 
-                    <Text className="text-base font-rubik-medium text-black-300 mt-5 mb-2">Home Details</Text>
+                    <Text className="text-base font-rubik-medium text-black-300 mt-5 mb-2">{t('homeDetails')}</Text>
                     <View className="flex-row justify-between items-center mb-3">
-                        <Text className="text-sm font-rubik text-black-300">Bedrooms</Text>
+                        <Text className="text-sm font-rubik text-black-300">{t('bedrooms')}</Text>
                         <View className="flex-row items-center">
                             <TouchableOpacity
                                 onPress={() => setBedrooms(bedrooms > 0 ? bedrooms - 1 : 0)}
@@ -147,7 +145,7 @@ const AdvancedFilters = ({ visible, setVisible }: AdvancedFiltersProps) => {
                         </View>
                     </View>
                     <View className="flex-row justify-between items-center">
-                        <Text className="text-sm font-rubik text-black-300">Bathrooms</Text>
+                        <Text className="text-sm font-rubik text-black-300">{t('bathrooms')}</Text>
                         <View className="flex-row items-center">
                             <TouchableOpacity
                                 onPress={() => setBathrooms(bathrooms > 0 ? bathrooms - 1 : 0)}
@@ -165,7 +163,7 @@ const AdvancedFilters = ({ visible, setVisible }: AdvancedFiltersProps) => {
                         </View>
                     </View>
 
-                    <Text className="text-base font-rubik-medium text-black-300 mt-5 mb-2">Area</Text>
+                    <Text className="text-base font-rubik-medium text-black-300 mt-5 mb-2">{t('area')}</Text>
                     <Slider
                         minimumValue={500}
                         maximumValue={3000}
@@ -187,12 +185,12 @@ const AdvancedFilters = ({ visible, setVisible }: AdvancedFiltersProps) => {
                         thumbTintColor="#4B5563"
                     />
                     <View className="flex-row justify-between">
-                        <Text>{areaRange[0]} sq ft</Text>
-                        <Text>{areaRange[1]} sq ft</Text>
+                        <Text>{areaRange[0]} {t('sqft')}</Text>
+                        <Text>{areaRange[1]} {t('sqft')}</Text>
                     </View>
 
                     <TouchableOpacity onPress={handleSetFilter} className="bg-primary-300 py-4 rounded-full mt-5">
-                        <Text className="text-white text-center font-rubik-medium">Set Filter</Text>
+                        <Text className="text-white text-center font-rubik-medium">{t('setFilter')}</Text>
                     </TouchableOpacity>
                 </View>
             </View>

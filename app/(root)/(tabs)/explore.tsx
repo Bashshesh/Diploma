@@ -5,21 +5,22 @@ import { useLocalSearchParams, router } from "expo-router";
 import icons from "@/constants/icons";
 import { Card } from "@/components/Cards";
 import Filters from "@/components/Filters";
-import AdvancedFilters from "@/components/AdvancedFilters";
 import Search from "@/components/Search";
 import NoResults from "@/components/NoResults";
 import { useAppwrite } from "@/lib/useAppWrite";
 import { getProperties } from "@/lib/appwrite";
+import { useTranslation } from 'react-i18next';
 
 const Explore = () => {
-    const params = useLocalSearchParams<{ query?: string; filter?: string; advancedFilter?: string }>(); // Added advancedFilter
+    const { t } = useTranslation();
+    const params = useLocalSearchParams<{ query?: string; filter?: string; advancedFilter?: string }>();
 
     const { data: properties, loading, refetch } = useAppwrite({
         fn: getProperties,
         params: {
             query: params.query || "",
             filter: params.filter || "",
-            advancedFilter: params.advancedFilter, // Pass advancedFilter
+            advancedFilter: params.advancedFilter,
             limit: 20,
         },
         skip: true,
@@ -29,10 +30,10 @@ const Explore = () => {
         refetch({
             query: params.query || "",
             filter: params.filter || "",
-            advancedFilter: params.advancedFilter, // Pass advancedFilter
+            advancedFilter: params.advancedFilter,
             limit: 20,
         });
-    }, [params.query, params.filter, params.advancedFilter]); // Added advancedFilter to dependencies
+    }, [params.query, params.filter, params.advancedFilter]);
 
     const handleCardPress = (id: string) => router.push(`/properties/${id}`);
 
@@ -42,7 +43,7 @@ const Explore = () => {
                 <TouchableOpacity onPress={() => router.push("/")}>
                     <Image source={icons.backArrow} className="size-7 border-2 rounded-full" />
                 </TouchableOpacity>
-                <Text className="text-lg font-rubik-bold text-black-300">Explore Properties</Text>
+                <Text className="text-lg font-rubik-bold text-black-300">{t('Explore')}</Text>
                 <TouchableOpacity>
                     <Image source={icons.bell} className="size-6" />
                 </TouchableOpacity>
@@ -63,7 +64,7 @@ const Explore = () => {
                     <View className="px-5 mt-5">
                         <Search />
                         <Filters />
-                        <Text className="text-xl font-rubik-bold text-black-300 mt-6 mb-3">Results</Text>
+                        <Text className="text-xl font-rubik-bold text-black-300 mt-6 mb-3">{t('results')}</Text>
                     </View>
                 }
             />
