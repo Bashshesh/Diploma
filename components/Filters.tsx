@@ -19,7 +19,7 @@ const Filters = () => {
         setSelectedCategory(category);
         router.setParams({ filter: category });
     };
-
+//сруслфлдаы
     return (
         <ScrollView horizontal showsHorizontalScrollIndicator={false} className="mt-3 mb-2">
             {categories.map((item, index) => (
