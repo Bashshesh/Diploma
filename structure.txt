@@ -1,0 +1,101 @@
+.
+├── README.md
+├── app
+│   ├── (root)
+│   │   ├── (tabs)
+│   │   │   ├── _layout.tsx
+│   │   │   ├── explore.tsx
+│   │   │   ├── index.tsx
+│   │   │   └── profile.tsx
+│   │   ├── _layout.tsx
+│   │   ├── nativewind-env.d.ts
+│   │   └── properties
+│   │       └── [id].tsx
+│   ├── _layout.tsx
+│   ├── globals.css
+│   └── sign-in.tsx
+├── app.json
+├── assets
+│   ├── fonts
+│   │   ├── Rubik-Bold.ttf
+│   │   ├── Rubik-ExtraBold.ttf
+│   │   ├── Rubik-Light.ttf
+│   │   ├── Rubik-Medium.ttf
+│   │   ├── Rubik-Regular.ttf
+│   │   └── Rubik-SemiBold.ttf
+│   ├── icons
+│   │   ├── area.png
+│   │   ├── back-arrow.png
+│   │   ├── bath.png
+│   │   ├── bed.png
+│   │   ├── bell.png
+│   │   ├── calendar.png
+│   │   ├── car-park.png
+│   │   ├── chat.png
+│   │   ├── cutlery.png
+│   │   ├── dog.png
+│   │   ├── dumbell.png
+│   │   ├── edit.png
+│   │   ├── filter.png
+│   │   ├── google.png
+│   │   ├── heart.png
+│   │   ├── home.png
+│   │   ├── info.png
+│   │   ├── language.png
+│   │   ├── laundry.png
+│   │   ├── location.png
+│   │   ├── logout.png
+│   │   ├── people.png
+│   │   ├── person.png
+│   │   ├── phone.png
+│   │   ├── right-arrow.png
+│   │   ├── run.png
+│   │   ├── search.png
+│   │   ├── send.png
+│   │   ├── shield.png
+│   │   ├── star.png
+│   │   ├── swim.png
+│   │   ├── wallet.png
+│   │   └── wifi.png
+│   └── images
+│       ├── avatar.png
+│       ├── bar-chart.png
+│       ├── card-gradient.png
+│       ├── favicon.png
+│       ├── icon.png
+│       ├── japan.png
+│       ├── map.png
+│       ├── new-york.png
+│       ├── no-result.png
+│       ├── onboarding.png
+│       ├── splash-icon.png
+│       ├── splash.png
+│       └── white-gradient.png
+├── babel.config.js
+├── components
+│   ├── AdvancedFilters.tsx
+│   ├── Cards.tsx
+│   ├── Filters.tsx
+│   ├── NoResults.tsx
+│   └── Search.tsx
+├── constants
+│   ├── data.ts
+│   ├── icons.ts
+│   └── images.ts
+├── expo-env.d.ts
+├── image.d.ts
+├── lib
+│   ├── appwrite.ts
+│   ├── data.ts
+│   ├── global-provider.tsx
+│   ├── seed.ts
+│   └── useAppWrite.ts
+├── metro.config.js
+├── nativewind-env.d.ts
+├── package-lock.json
+├── package.json
+├── structure.txt
+├── tailwind.config.js
+└── tsconfig.json
+
+12 directories, 87 files
