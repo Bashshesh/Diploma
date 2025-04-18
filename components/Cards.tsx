@@ -1,52 +1,19 @@
 import { View, Text, Image, TouchableOpacity } from 'react-native';
-import React, { useState, useEffect } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import React from 'react';
 import icons from '@/constants/icons';
 import images from '@/constants/images';
 import { Models } from 'react-native-appwrite';
 import { useTranslation } from 'react-i18next';
+import {useFavorite} from "@/lib/useFavorite";
 
 interface Props {
     item: Models.Document;
     onPress?: () => void;
 }
 
-const FAVORITES_KEY = '@favorites';
-
 export const Card = ({ item: { image, rating, name, address, price, $id }, onPress }: Props) => {
     const { t } = useTranslation();
-    const [isFavorite, setIsFavorite] = useState(false);
-
-    useEffect(() => {
-        const loadFavoriteStatus = async () => {
-            try {
-                const favorites = await AsyncStorage.getItem(FAVORITES_KEY);
-                const favoritesArray = favorites ? JSON.parse(favorites) : [];
-                setIsFavorite(favoritesArray.includes($id));
-            } catch (error) {
-                console.error('Error loading favorites:', error);
-            }
-        };
-        loadFavoriteStatus();
-    }, [$id]);
-
-    const toggleFavorite = async () => {
-        try {
-            const favorites = await AsyncStorage.getItem(FAVORITES_KEY);
-            let favoritesArray = favorites ? JSON.parse(favorites) : [];
-
-            if (isFavorite) {
-                favoritesArray = favoritesArray.filter((id: string) => id !== $id);
-            } else {
-                favoritesArray.push($id);
-            }
-
-            await AsyncStorage.setItem(FAVORITES_KEY, JSON.stringify(favoritesArray));
-            setIsFavorite(!isFavorite);
-        } catch (error) {
-            console.error('Error toggling favorite:', error);
-        }
-    };
+    const { isFavorite, toggleFavorite } = useFavorite($id);
 
     return (
         <TouchableOpacity
@@ -80,38 +47,7 @@ export const Card = ({ item: { image, rating, name, address, price, $id }, onPre
 
 export const FeaturedCard = ({ item: { image, rating, name, address, price, $id }, onPress }: Props) => {
     const { t } = useTranslation();
-    const [isFavorite, setIsFavorite] = useState(false);
-
-    useEffect(() => {
-        const loadFavoriteStatus = async () => {
-            try {
-                const favorites = await AsyncStorage.getItem(FAVORITES_KEY);
-                const favoritesArray = favorites ? JSON.parse(favorites) : [];
-                setIsFavorite(favoritesArray.includes($id));
-            } catch (error) {
-                console.error('Error loading favorites:', error);
-            }
-        };
-        loadFavoriteStatus();
-    }, [$id]);
-
-    const toggleFavorite = async () => {
-        try {
-            const favorites = await AsyncStorage.getItem(FAVORITES_KEY);
-            let favoritesArray = favorites ? JSON.parse(favorites) : [];
-
-            if (isFavorite) {
-                favoritesArray = favoritesArray.filter((id: string) => id !== $id);
-            } else {
-                favoritesArray.push($id);
-            }
-
-            await AsyncStorage.setItem(FAVORITES_KEY, JSON.stringify(favoritesArray));
-            setIsFavorite(!isFavorite);
-        } catch (error) {
-            console.error('Error toggling favorite:', error);
-        }
-    };
+    const { isFavorite, toggleFavorite } = useFavorite($id);
 
     return (
         <TouchableOpacity onPress={onPress} className="flex flex-col items-start w-60 h-80 relative">

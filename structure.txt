@@ -9,6 +9,10 @@
 │   │   │   └── profile.tsx
 │   │   ├── _layout.tsx
 │   │   ├── nativewind-env.d.ts
+│   │   ├── profile
+│   │   │   ├── bookings.tsx
+│   │   │   ├── language.tsx
+│   │   │   └── notifications.tsx
 │   │   └── properties
 │   │       └── [id].tsx
 │   ├── _layout.tsx
@@ -88,6 +92,7 @@
 │   ├── appwrite.ts
 │   ├── data.ts
 │   ├── global-provider.tsx
+│   ├── i18n.ts
 │   ├── seed.ts
 │   └── useAppWrite.ts
 ├── metro.config.js
@@ -98,4 +103,4 @@
 ├── tailwind.config.js
 └── tsconfig.json
 
-12 directories, 87 files
+13 directories, 91 files

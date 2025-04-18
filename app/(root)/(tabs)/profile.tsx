@@ -7,6 +7,7 @@ import { useGlobalContext } from '@/lib/global-provider';
 import { logout } from '@/lib/appwrite';
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
+import UserAvatar from "@/components/UserAvatar";
 
 interface SettingsItemProps {
     icon: ImageSourcePropType;
@@ -61,13 +62,7 @@ const Profile = () => {
                 </View>
 
                 <View className="flex-row justify-center flex mt-5">
-                    <View className="flex flex-col items-center relative mt-5">
-                        <Image source={{ uri: user?.avatar }} className="size-44 relative rounded-full" />
-                        <TouchableOpacity className="absolute bottom-11 right-2">
-                            <Image source={icons.edit} className="size-9" />
-                        </TouchableOpacity>
-                        <Text className="text-2xl font-rubik-bold mt-2">{user?.name}</Text>
-                    </View>
+                    <UserAvatar size={44} textSize="text-2xl" />
                 </View>
 
                 <View className="flex flex-col mt-10">

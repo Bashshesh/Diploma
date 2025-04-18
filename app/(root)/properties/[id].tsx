@@ -4,56 +4,26 @@ import { router, useLocalSearchParams } from "expo-router";
 import { useAppwrite } from "@/lib/useAppWrite";
 import { getPropertyById } from "@/lib/appwrite";
 import icons from "@/constants/icons";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { StatusBar } from "expo-status-bar";
 import { facilities } from "@/constants/data";
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTranslation } from 'react-i18next';
-
-const FAVORITES_KEY = '@favorites';
+import { useFavorite } from '@/lib/useFavorite';
 
 export default function PropertyDetails() {
-    const { t } = useTranslation(); // Хук для переводов
+    const { t } = useTranslation();
     const { id } = useLocalSearchParams<{ id: string }>();
     const { data: property, loading, refetch, error } = useAppwrite({
         fn: getPropertyById,
         params: { id },
     });
-    const [isFavorite, setIsFavorite] = useState(false);
+    const { isFavorite, toggleFavorite } = useFavorite(id || '');
 
     useEffect(() => {
         if (id) {
             refetch({ id });
-            const loadFavoriteStatus = async () => {
-                try {
-                    const favorites = await AsyncStorage.getItem(FAVORITES_KEY);
-                    const favoritesArray = favorites ? JSON.parse(favorites) : [];
-                    setIsFavorite(favoritesArray.includes(id));
-                } catch (error) {
-                    console.error('Error loading favorites:', error);
-                }
-            };
-            loadFavoriteStatus();
         }
     }, [id]);
-
-    const toggleFavorite = async () => {
-        try {
-            const favorites = await AsyncStorage.getItem(FAVORITES_KEY);
-            let favoritesArray = favorites ? JSON.parse(favorites) : [];
-
-            if (isFavorite) {
-                favoritesArray = favoritesArray.filter((favId: string) => favId !== id);
-            } else {
-                favoritesArray.push(id);
-            }
-
-            await AsyncStorage.setItem(FAVORITES_KEY, JSON.stringify(favoritesArray));
-            setIsFavorite(!isFavorite);
-        } catch (error) {
-            console.error('Error toggling favorite:', error);
-        }
-    };
 
     if (loading) {
         return (
