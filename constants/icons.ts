@@ -1,6 +1,7 @@
 import google from "@/assets/icons/google.png";
 import home from "@/assets/icons/home.png";
 import search from "@/assets/icons/search.png";
+import trash from "@/assets/icons/trash.png";
 import person from "@/assets/icons/person.png";
 import bell from "@/assets/icons/bell.png";
 import filter from "@/assets/icons/filter.png";
@@ -31,6 +32,7 @@ import swim from "@/assets/icons/swim.png";
 import wifi from "@/assets/icons/wifi.png";
 import location from "@/assets/icons/location.png";
 import edit from "@/assets/icons/edit.png";
+import bin from "@/assets/icons/bin.png";
 
 export default {
   google,
@@ -66,4 +68,6 @@ export default {
   wifi,
   location,
   edit,
+  trash,
+  bin,
 };

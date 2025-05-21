@@ -1,5 +1,5 @@
 import { View, Text, ScrollView, Image, TouchableOpacity, ImageSourcePropType, Alert } from 'react-native';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import icons from '@/constants/icons';
 import { settings } from '@/constants/data';
@@ -8,6 +8,7 @@ import { logout } from '@/lib/appwrite';
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import UserAvatar from "@/components/UserAvatar";
+import { verifyAgentRole } from "../admin/admin-logic";
 
 interface SettingsItemProps {
     icon: ImageSourcePropType;
@@ -33,20 +34,40 @@ const SettingItems = ({ icon, title, onPress, textStyle, showArrow = true }: Set
 const Profile = () => {
     const { user, refetch } = useGlobalContext();
     const { t } = useTranslation();
+    const [isAgent, setIsAgent] = useState(false);
+
+    useEffect(() => {
+        console.log("User ID:", user?.$id); // Выводит $id пользователя
+        const checkAgent = async () => {
+            if (user && user.$id) {
+                const agentStatus = await verifyAgentRole(user.$id);
+                setIsAgent(agentStatus);
+            }
+        };
+        checkAgent();
+    }, [user]);
+
+    // Проверка роли риелтора
+    useEffect(() => {
+        const checkAgent = async () => {
+            if (user && user.$id) {
+                const agentStatus = await verifyAgentRole(user.$id);
+                setIsAgent(agentStatus);
+            }
+        };
+        checkAgent();
+    }, [user]);
 
     const handleLogout = async () => {
-        const { addError } = useGlobalContext(); // Добавляем доступ к addError
         try {
             const result = await logout();
             if (result) {
                 Alert.alert(t('success'), t('loggedOut'));
                 refetch();
             } else {
-                addError('Logout failed without specific error');
                 Alert.alert(t('error'), t('failedToLogout'));
             }
         } catch (error: any) {
-            addError(`Logout error: ${error.message}`);
             Alert.alert(t('error'), t('failedToLogout'));
         }
     };
@@ -72,36 +93,44 @@ const Profile = () => {
                         title="myBookings"
                     />
                     <SettingItems icon={icons.wallet} title="payments" />
-                </View>
+                    {isAgent && (
+                        <SettingItems
+                            icon={icons.edit}
+                            title="adminPanel"
+                            onPress={() => router.push('/(root)/admin')}
+                        />
+                        )
+                    }
+                        </View>
 
-                <View className="flex flex-col mt-5 border-t pt-5 border-primary-200">
-                    <SettingItems
+                        <View className="flex flex-col mt-5 border-t pt-5 border-primary-200">
+                        <SettingItems
                         icon={icons.language}
-                        title="language"
-                        onPress={() => router.push('/(root)/profile/language')}
-                    />
-                    <SettingItems
-                        icon={icons.bell}
-                        title="notifications"
-                        onPress={() => router.push('/(root)/profile/notifications')}
-                    />
-                    {settings.slice(3).map((item, index) => (
-                        <SettingItems key={index} {...item} />
-                    ))}
-                </View>
+                      title="language"
+                      onPress={() => router.push('/(root)/profile/language')}
+                />
+                <SettingItems
+                    icon={icons.bell}
+                    title="notifications"
+                    onPress={() => router.push('/(root)/profile/notifications')}
+                />
+                {settings.slice(3).map((item, index) => (
+                    <SettingItems key={index} {...item} />
+                ))}
+            </View>
 
-                <View className="flex flex-col mt-5 border-t pt-5 border-primary-200">
-                    <SettingItems
-                        icon={icons.logout}
-                        title="logout"
-                        textStyle="text-danger"
-                        showArrow={false}
-                        onPress={handleLogout}
-                    />
-                </View>
-            </ScrollView>
-        </SafeAreaView>
-    );
+            <View className="flex flex-col mt-5 border-t pt-5 border-primary-200">
+                <SettingItems
+                    icon={icons.logout}
+                    title="logout"
+                    textStyle="text-danger"
+                    showArrow={false}
+                    onPress={handleLogout}
+                />
+            </View>
+        </ScrollView>
+</SafeAreaView>
+    )
 };
 
 export default Profile;

@@ -3,7 +3,7 @@ import { View, TouchableOpacity, Image, TextInput } from "react-native";
 import { useDebouncedCallback } from "use-debounce";
 import icons from "@/constants/icons";
 import { useLocalSearchParams, router } from "expo-router";
-import AdvancedFilters from "./AdvancedFilters"; // Import AdvancedFilters
+import AdvancedFilters from "./AdvancedFilters";
 
 const Search = () => {
     const params = useLocalSearchParams<{ query?: string }>();

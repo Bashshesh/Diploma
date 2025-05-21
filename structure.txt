@@ -8,6 +8,10 @@
 │   │   │   ├── index.tsx
 │   │   │   └── profile.tsx
 │   │   ├── _layout.tsx
+│   │   ├── admin
+│   │   │   ├── _layout.tsx
+│   │   │   ├── admin-logic.ts
+│   │   │   └── index.tsx
 │   │   ├── nativewind-env.d.ts
 │   │   ├── profile
 │   │   │   ├── bookings.tsx
@@ -33,6 +37,7 @@
 │   │   ├── bath.png
 │   │   ├── bed.png
 │   │   ├── bell.png
+│   │   ├── bin.png
 │   │   ├── calendar.png
 │   │   ├── car-park.png
 │   │   ├── chat.png
@@ -59,6 +64,7 @@
 │   │   ├── shield.png
 │   │   ├── star.png
 │   │   ├── swim.png
+│   │   ├── trash.png
 │   │   ├── wallet.png
 │   │   └── wifi.png
 │   └── images
@@ -81,7 +87,9 @@
 │   ├── Cards.tsx
 │   ├── Filters.tsx
 │   ├── NoResults.tsx
-│   └── Search.tsx
+│   ├── PropertyForm.tsx
+│   ├── Search.tsx
+│   └── UserAvatar.tsx
 ├── constants
 │   ├── data.ts
 │   ├── icons.ts
@@ -94,7 +102,8 @@
 │   ├── global-provider.tsx
 │   ├── i18n.ts
 │   ├── seed.ts
-│   └── useAppWrite.ts
+│   ├── useAppWrite.ts
+│   └── useFavorite.ts
 ├── metro.config.js
 ├── nativewind-env.d.ts
 ├── package-lock.json
@@ -103,4 +112,4 @@
 ├── tailwind.config.js
 └── tsconfig.json
 
-13 directories, 91 files
+14 directories, 99 files

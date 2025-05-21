@@ -41,7 +41,7 @@ const Explore = () => {
         <SafeAreaView className="bg-white h-full">
             <View className="flex-row items-center justify-between px-5 pt-4 mb-4">
                 <TouchableOpacity onPress={() => router.push("/")}>
-                    <Image source={icons.backArrow} className="size-7 border-2 rounded-full" />
+                    <Image source={icons.backArrow} className="size-7" />
                 </TouchableOpacity>
                 <Text className="text-lg font-rubik-bold text-black-300">{t('Explore')}</Text>
                 <TouchableOpacity>
