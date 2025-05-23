@@ -1,4 +1,4 @@
-import { Text, View, Image, FlatList, TouchableOpacity, ScrollView, ActivityIndicator } from "react-native";
+import {Text, View, Image, FlatList, TouchableOpacity, ScrollView, ActivityIndicator, Button} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router, useLocalSearchParams } from "expo-router";
 import { useAppwrite } from "@/lib/useAppWrite";
@@ -9,10 +9,13 @@ import { StatusBar } from "expo-status-bar";
 import { facilities } from "@/constants/data";
 import { useTranslation } from 'react-i18next';
 import { useFavorite } from '@/lib/useFavorite';
+import {useGlobalContext} from "@/lib/global-provider";
+
 
 export default function PropertyDetails() {
     const { t } = useTranslation();
     const { id } = useLocalSearchParams<{ id: string }>();
+    const { user } = useGlobalContext();
     const { data: property, loading, refetch, error } = useAppwrite({
         fn: getPropertyById,
         params: { id },
@@ -245,10 +248,39 @@ export default function PropertyDetails() {
                 <View className="px-5 mt-5 mb-10">
                     <View className="flex flex-row items-center justify-between">
                         <Text className="text-xl font-rubik-bold text-black-300">${property.price || 0}</Text>
-                        <TouchableOpacity className="bg-primary-300 rounded-full px-5 py-3">
+                        <TouchableOpacity
+                            className="bg-primary-300 rounded-full px-5 py-3"
+                            onPress={() => {
+                                router.push(`payment/payment?id=${property.$id}`);
+                            }}
+                        >
                             <Text className="text-base font-rubik-medium text-white">{t('bookingNow')}</Text>
                         </TouchableOpacity>
                     </View>
+                </View>
+
+                <View style={{ padding: 20 }}>
+                    <TouchableOpacity
+                        className="bg-primary-300 rounded-full px-5 py-3 items-center justify-center"
+                        onPress={() => {
+                            console.log("property.agent:", property.agent);
+                            console.log("agentId being passed:", property.agent?.userId);
+                            router.push({
+                                pathname: `/chat/${property.$id}`,
+                                params: {
+                                    chatId: `${property.agent.$id}-${user.$id}`, // можно сгенерировать chatId
+                                    propertyId: property.$id,
+                                    agentId: property.agent?.userId,
+                                },
+                            });
+                        }}
+                        disabled={!property.agent}
+                    >
+                        <Text className="text-base font-rubik-medium text-white">
+                            {property.agent.$id}
+                            {t('textwithagent')}
+                        </Text>
+                </TouchableOpacity>
                 </View>
             </ScrollView>
         </SafeAreaView>

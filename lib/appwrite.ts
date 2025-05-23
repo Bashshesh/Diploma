@@ -12,6 +12,7 @@ export const config = {
     reviewsCollectionId: process.env.EXPO_PUBLIC_APPWRITE_REVIEWS_COLLECTION_ID,
     agentsCollectionId: process.env.EXPO_PUBLIC_APPWRITE_AGENTS_COLLECTION_ID,
     propertiesCollectionId: process.env.EXPO_PUBLIC_APPWRITE_PROPERTIES_COLLECTION_ID,
+    messagesCollectionId: process.env.EXPO_PUBLIC_APPWRITE_MESSAGES_COLLECTION_ID,
 };
 
 export const client = new Client();
@@ -248,6 +249,7 @@ export const getPropertyById = async ({ id }: { id: string }) => {
                     name: agent.name || "Unknown Agent",
                     email: agent.email || "No email available",
                     avatar: agent.avatar || "https://via.placeholder.com/50",
+                    userId: agent.userId || "67b724d11e1a5a73a772",
                 }
                 : null,
             galleries, // Replace the empty "galleries" with the mapped data
@@ -257,3 +259,74 @@ export const getPropertyById = async ({ id }: { id: string }) => {
         throw error;
     }
 };
+
+export async function sendMessage({
+                                      propertyId,
+                                      senderID,
+                                      receiverId,
+                                      message,
+                                      senderType,
+                                  }: {
+    propertyId: string;
+    senderID: string;
+    receiverId: string;
+    message: string;
+    senderType: "user" | "agent";
+}) {
+    try {
+        const response = await databases.createDocument(
+            config.databaseId!,
+            config.messagesCollectionId!,
+            ID.unique(),
+            {
+                propertyId,
+                senderID,
+                receiverId,
+                message,
+                timestamp: new Date().toISOString(),
+                senderType,
+            }
+        );
+        return response;
+    } catch (error) {
+        console.error("Error sending message:", error);
+        throw error;
+    }
+}
+
+export async function getMessages(propertyId: string) {
+    try {
+        const response = await databases.listDocuments(
+            config.databaseId!,
+            config.messagesCollectionId!,
+            [
+                Query.equal("propertyId", propertyId),
+                Query.orderAsc("timestamp"),
+            ]
+        );
+        return response.documents;
+    } catch (error) {
+        console.error("Error fetching messages:", error);
+        return [];
+    }
+}
+
+export function subscribeToMessages(
+    propertyId: string,
+    callback: (payload: any) => void
+) {
+    const unsubscribe = client.subscribe(
+        `databases.${config.databaseId}.collections.${config.messagesCollectionId}.documents`,
+        (response) => {
+            if (
+                response.events.includes(
+                    "databases.*.collections.*.documents.*.create"
+                ) &&
+                response.payload.propertyId === propertyId
+            ) {
+                callback(response.payload);
+            }
+        }
+    );
+    return unsubscribe;
+}
